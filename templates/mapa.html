@@ -2,32 +2,89 @@
 <html lang="es">
 <head>
     <meta charset="utf-8"/>
-    <title>Geovisor de Avalúos</title>
+    <title>Geovisor</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
     <style>
-      #map { height: 90vh; width: 100%; }
+      #map { height: 92vh; width: 100%; }
       body { background: #fafafa; margin:0; padding:0; font-family: Roboto,sans-serif;}
       h3 { text-align:center; margin: 2rem 0 1rem; color:#1565c0;}
     </style>
 </head>
 <body>
-    <h3>Mapa de Avalúos</h3>
+    <h3>🗺️ Geovisor Inmobiliario 🗺️</h3>
     <div id="map"></div>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
     <script>
       var map = L.map('map').setView([4.65, -74.1], 12);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-      }).addTo(map);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19}).addTo(map);
 
-      fetch("/api/avaluos")
-        .then(res => res.json())
-        .then(data => {
-            data.forEach(pt => {
-                L.marker([pt.lat, pt.lon])
-                  .addTo(map)
-                  .bindPopup("<b>Consecutivo:</b> " + pt.consecutivo + "<br><b>Dirección:</b> " + (pt.direccion || ""));
-            });
+      var overlays = {};
+      var control = L.control.layers(null, overlays, {collapsed:false}).addTo(map);
+
+      fetch("/api/lista_capas")
+        .then(r => r.json())
+        .then(lista => {
+          lista.forEach(function(c){
+            fetch("/api/capa/" + c.id)
+              .then(r2 => r2.json())
+              .then(geojson => {
+                let estilo = (c.tipo == "polygon") ? {color: '#1976d2', fillOpacity:0.15} : {};
+                // --------- CLUSTER para ofertas ----------
+                if (c.id === "oferta") {
+                  var redIcon = new L.Icon({
+                    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+                    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41]
+                  });
+                  var clusterGroup = L.markerClusterGroup();
+                  var capaL = L.geoJSON(geojson, {
+                    pointToLayer: function(f, latlng) {
+                      return L.marker(latlng, {icon: redIcon});
+                    },
+                    onEachFeature: function(feature, layer) {
+                      let props = feature.properties;
+                      let texto = '';
+                      for (const [k,v] of Object.entries(props)) {
+                        texto += `<b>${k}:</b> ${v}<br>`;
+                      }
+                      layer.bindPopup(texto);
+                    }
+                  });
+                  clusterGroup.addLayer(capaL);
+                  overlays[c.nombre] = clusterGroup;
+                  control.addOverlay(clusterGroup, c.nombre);
+                  // NO agregar a map por defecto
+                } else {
+                  // --- Otras capas ---
+                  var capaL = L.geoJSON(geojson, {
+                    style: estilo,
+                    pointToLayer: function(f, latlng) {
+                      return L.marker(latlng);
+                    },
+                    onEachFeature: function(feature, layer) {
+                      let props = feature.properties;
+                      let texto = '';
+                      for (const [k,v] of Object.entries(props)) {
+                        texto += `<b>${k}:</b> ${v}<br>`;
+                      }
+                      layer.bindPopup(texto);
+                    }
+                  });
+                  overlays[c.nombre] = capaL;
+                  control.addOverlay(capaL, c.nombre);
+                  // Solo agrega "Avalúos" al mapa por defecto
+                  if (c.id === "avaluo") {
+                    capaL.addTo(map);
+                  }
+                }
+              });
+          });
         });
     </script>
 </body>
