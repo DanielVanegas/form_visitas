@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Form, Request, HTTPException
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -162,3 +162,31 @@ async def recibir_formulario(request: Request,
 @app.get("/enviar", include_in_schema=False)
 def redirigir_si_get():
     return RedirectResponse("/", status_code=303)
+
+@app.get("/mapa", response_class=HTMLResponse)
+def mostrar_mapa(request: Request):
+    return templates.TemplateResponse("mapa.html", {"request": request})
+
+@app.get("/api/avaluos")
+def api_avaluos():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT id_avaluo, consecutivo, direccion, ST_X(geom), ST_Y(geom)
+        FROM app.avaluo
+        WHERE geom IS NOT NULL
+    """)
+    data = [
+        {
+            "id_avaluo": row[0],
+            "consecutivo": row[1],
+            "direccion": row[2],
+            "lon": row[3],
+            "lat": row[4],
+        }
+        for row in cur.fetchall()
+    ]
+    cur.close()
+    conn.close()
+    return JSONResponse(data)
+
