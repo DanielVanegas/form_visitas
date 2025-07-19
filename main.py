@@ -172,61 +172,82 @@ CAPAS = {
         "tabla": "app.am_mov_masa",
         "tipo": "polygon",
         "nombre": "Movimientos de Masa",
-        "sql": "SELECT fid as id, codigo_id, escenario, clase_suel, ST_AsGeoJSON(geom)::json as geom FROM app.am_mov_masa WHERE geom IS NOT NULL"
+        "sql": """
+            SELECT 
+                CASE 
+                    WHEN categoriza = 1 THEN 'Baja'
+                    WHEN categoriza = 2 THEN 'Media'
+                    WHEN categoriza = 3 THEN 'Alta'
+                    ELSE 'Sin clasificar'
+                END as categorizacion,
+                area_zonif, 
+                clase_suel, 
+                ST_AsGeoJSON(geom)::json as geom 
+            FROM app.am_mov_masa 
+            WHERE geom IS NOT NULL
+        """
     },
     "area_actividad": {
         "tabla": "app.area_actividad",
         "tipo": "polygon",
         "nombre": "Áreas de Actividad",
-        "sql": "SELECT fid as id, nombre_area_actividad, acto_administrativo, ST_AsGeoJSON(geom)::json as geom FROM app.area_actividad WHERE geom IS NOT NULL"
+        "sql": "SELECT codigo_area_actividad as codigo, nombre_area_actividad as tipo, ST_AsGeoJSON(geom)::json as geom FROM app.area_actividad WHERE geom IS NOT NULL"
     },
     "avaluo": {
         "tabla": "app.avaluo",
         "tipo": "point",
         "nombre": "Avalúos",
-        "sql": "SELECT id_avaluo as id, consecutivo, direccion, ST_AsGeoJSON(geom)::json as geom FROM app.avaluo WHERE geom IS NOT NULL"
+        "sql": """
+            SELECT 
+                consecutivo, 
+                area_privada, 
+                TO_CHAR(valor_m2, '$999G999G999') as valor_m2, 
+                direccion, 
+                vetustez,
+                ST_AsGeoJSON(geom)::json as geom 
+            FROM app.avaluo 
+            WHERE geom IS NOT NULL
+        """
     },
     "barrios": {
         "tabla": "app.barrios",
         "tipo": "polygon",
         "nombre": "Barrios",
-        "sql": "SELECT fid as id, scanombre, scacodigo, ST_AsGeoJSON(geom)::json as geom FROM app.barrios WHERE geom IS NOT NULL"
+        "sql": "SELECT scanombre as nombre, ST_AsGeoJSON(geom)::json as geom FROM app.barrios WHERE geom IS NOT NULL"
     },
     "localidades": {
         "tabla": "app.localidades",
         "tipo": "polygon",
         "nombre": "Localidades",
-        "sql": "SELECT fid as id, locnombre, loccodigo, ST_AsGeoJSON(geom)::json as geom FROM app.localidades WHERE geom IS NOT NULL"
+        "sql": "SELECT locnombre as localidad, ST_AsGeoJSON(geom)::json as geom FROM app.localidades WHERE geom IS NOT NULL"
     },
     "mz_estr": {
         "tabla": "app.mz_estr",
         "tipo": "polygon",
         "nombre": "Estratificación",
-        "sql": "SELECT fid as id, codigo_manzana, estrato, ST_AsGeoJSON(geom)::json as geom FROM app.mz_estr WHERE geom IS NOT NULL"
+        "sql": "SELECT estrato, ST_AsGeoJSON(geom)::json as geom FROM app.mz_estr WHERE geom IS NOT NULL"
     },
     "oferta": {
         "tabla": "app.oferta",
         "tipo": "point",
         "nombre": "Ofertas",
-        "sql": "SELECT id_oferta as id, direccion, precio, area_privada, habitaciones, estrato, ST_AsGeoJSON(geom)::json as geom FROM app.oferta WHERE geom IS NOT NULL"
-    },
-    "sec_incomp_uso_resid": {
-        "tabla": "app.sec_incomp_uso_resid",
-        "tipo": "polygon",
-        "nombre": "Sec. Incomp. uso Resid.",
-        "sql": "SELECT fid as id, sector, clase_suel, observacio, ST_AsGeoJSON(geom)::json as geom FROM app.sec_incomp_uso_resid WHERE geom IS NOT NULL"
+        "sql": """
+            SELECT id_oferta as id, precio, area_privada, ST_AsGeoJSON(geom)::json as geom 
+            FROM app.oferta 
+            WHERE geom IS NOT NULL
+        """
     },
     "sitios_de_interes": {
         "tabla": "app.sitios_de_interes",
         "tipo": "point",
         "nombre": "Sitios de Interés",
-        "sql": "SELECT fid as id, ngenombre, ngeclasifi, ST_AsGeoJSON(geom)::json as geom FROM app.sitios_de_interes WHERE geom IS NOT NULL"
+        "sql": "SELECT ngenombre, ngeclasifi, ST_AsGeoJSON(geom)::json as geom FROM app.sitios_de_interes WHERE geom IS NOT NULL"
     },
     "tratamientos": {
         "tabla": "app.tratamientos",
         "tipo": "polygon",
         "nombre": "Tratamientos Urbanísticos",
-        "sql": "SELECT fid as id, nombre_tratamiento, tipologia, altura_maxima, ST_AsGeoJSON(geom)::json as geom FROM app.tratamientos WHERE geom IS NOT NULL"
+        "sql": "SELECT nombre_tratamiento, tipologia, altura_maxima, ST_AsGeoJSON(geom)::json as geom FROM app.tratamientos WHERE geom IS NOT NULL"
     }
 }
 
