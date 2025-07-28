@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Form, Request, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from psycopg2 import IntegrityError
@@ -8,6 +9,7 @@ from pydantic import BaseModel, validator
 from pydantic import root_validator 
 from dotenv import load_dotenv
 from typing import Optional
+import json
 import os
 
 app = FastAPI()
@@ -71,6 +73,23 @@ def obtener_municipios():
     conn.close()
     return municipios
 
+def obtener_consecutivos_pendientes():
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute("""
+        SELECT a.consecutivo, a.fecha_asignacion
+        FROM app.asignacion a
+        LEFT JOIN app.visita v ON a.consecutivo = v.consecutivo
+        WHERE v.consecutivo IS NULL
+            AND a.fecha_asignacion IS NOT NULL
+            AND a.fecha_entrega IS NULL
+        ORDER BY a.fecha_asignacion DESC
+    """)
+    consecutivos = cur.fetchall()
+    cur.close()
+    conn.close()
+    return consecutivos
+
 class VisitaForm(BaseModel):
     consecutivo: str
     fecha_formulario: str
@@ -120,7 +139,13 @@ def home(request: Request):
 @app.get("/form_visita", response_class=HTMLResponse)
 def mostrar_formulario(request: Request, exito: int = 0):
     usuarios = obtener_usuarios()
-    return templates.TemplateResponse("form.html", {"request": request, "usuarios": usuarios, "exito": exito})
+    consecutivos = obtener_consecutivos_pendientes()
+    return templates.TemplateResponse("form.html", {
+        "request": request, 
+        "usuarios": usuarios, 
+        "consecutivos": consecutivos,
+        "exito": exito
+    })
 
 @app.post("/enviar")
 async def recibir_formulario(request: Request,
@@ -326,3 +351,46 @@ async def recibir_form_asignacion(
     except Exception as e:
         print("Error al insertar asignacion:", e)
         raise HTTPException(status_code=500, detail="Error al guardar la asignación.")
+
+@app.get("/dashboard", response_class=HTMLResponse)
+def ver_dashboard(request: Request):
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute("""
+        SELECT a.*, m.mpio_cnmbr AS municipio
+        FROM app.asignacion a
+        LEFT JOIN app.municipio m ON a.municipio_id = m.id
+        ORDER BY fecha_asignacion DESC;
+    """)
+    asignaciones = cur.fetchall()
+    cur.close()
+    conn.close()
+    return templates.TemplateResponse("dashboard.html", {
+        "request": request,
+        "asignaciones": asignaciones
+    })
+
+@app.post("/update-asignacion")
+async def update_asignacion(request: Request):
+    data = await request.json()
+    consecutivo = data.get("consecutivo")
+    campo = data.get("campo")
+    valor = data.get("valor")
+
+    if campo not in ["fecha_visita", "hora_visita", "fecha_entrega", "observaciones"]:
+        return JSONResponse(content={"error": "Campo inválido"}, status_code=400)
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute(f"""
+            UPDATE app.asignacion
+            SET {campo} = %s
+            WHERE consecutivo = %s
+        """, (valor if valor != "" else None, consecutivo))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return {"mensaje": "ok"}
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)

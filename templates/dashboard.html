@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Asignaciones</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style_material.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    /* Colores de fondo por estado */
+    .estado-entregado { background-color: #e8f5e9; }
+    .estado-por-visitar { background-color: #fffde7; }
+    .estado-por-agendar { background-color: #fff3e0; }
+    .estado-con-novedad { background-color: #ffebee; }
+    .estado-por-montar { background-color: #e3f2fd; }
+
+    table td, table th {
+      vertical-align: middle;
+    }
+
+    .search-container {
+      margin: 1rem 0;
+    }
+
+    .btn-small i.material-icons {
+      font-size: 18px;
+    }
+
+    thead input {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid #ccc;
+      padding: 4px;
+      font-size: 0.9rem;
+      background: transparent;
+    }
+
+    .edit-btn, .save-btn {
+      cursor: pointer;
+      margin-right: 4px;
+    }
+
+    .dataTables_length, .dataTables_info, .dataTables_paginate {
+      display: none;
+    }
+
+    .material-symbols-outlined {
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body class="grey lighten-4">
+  <div class="container">
+    <h4 class="center-align"><i class="material-icons">bar_chart</i> Dashboard Asignaciones</h4>
+
+    <table id="tablaDashboard" class="striped highlight responsive-table">
+      <thead>
+        <tr>
+          <th>Consecutivo</th>
+          <th>Fecha Asig</th>
+          <th>Fecha Visita</th>
+          <th>Hora Visita</th>
+          <th>Fecha Entrega</th>
+          <th>Estado</th>
+          <th>Observaciones</th>
+          <th>Municipio</th>
+          <th>Facturación</th>
+          <th>Solo Fotos</th>
+          <th>Localizador</th>
+          <th>Acciones</th>
+        </tr>
+        <tr>
+          <th><input type="text" placeholder="Filtrar..."></th>
+          <th><input type="text" placeholder="Filtrar..."></th>
+          <th><input type="text" placeholder="Filtrar..."></th>
+          <th><input type="text" placeholder="Filtrar..."></th>
+          <th><input type="text" placeholder="Filtrar..."></th>
+          <th><input type="text" placeholder="Filtrar..."></th>
+          <th><input type="text" placeholder="Filtrar..."></th>
+          <th><input type="text" placeholder="Filtrar..."></th>
+          <th><input type="text" placeholder="Filtrar..."></th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in asignaciones %}
+        <tr class="{{ 'estado-' + a.estado|lower|replace(' ', '-') }}">
+          <td>{{ a.consecutivo }}</td>
+          <td>{{ a.fecha_asignacion }}</td>
+          <td data-campo="fecha_visita">{{ a.fecha_visita or '' }}</td>
+          <td data-campo="hora_visita">{{ a.hora_visita or '' }}</td>
+          <td data-campo="fecha_entrega">{{ a.fecha_entrega or '' }}</td>
+          <td><strong>{{ a.estado }}</strong></td>
+          <td data-campo="observaciones">{{ a.observaciones or '' }}</td>
+          <td>{{ a.municipio }}</td>
+          <td>{{ a.fecha_facturacion or '' }}</td>
+          <td>{{ '✅' if a.solo_fotos else '' }}</td>
+          <td>
+            {% if a.fecha_entrega %}
+              <a href="/geovisor?consecutivo={{ a.consecutivo }}" class="btn-small orange" target="_blank">
+                <i class="material-icons">location_on</i>
+              </a>
+            {% endif %}
+          </td>
+          <td>
+            <button class="btn-small blue lighten-1 edit-btn"><i class="material-icons">edit</i></button>
+            <button class="btn-small green lighten-1 save-btn" style="display: none;"><i class="material-icons">save</i></button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      const tabla = $('#tablaDashboard').DataTable({
+        paging: false,
+        order: [[1, "desc"]],
+        language: {
+          url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+        },
+        initComplete: function () {
+          this.api().columns().every(function () {
+            var that = this;
+            $('input', this.header()).on('keyup change clear', function () {
+              if (that.search() !== this.value) {
+                that.search(this.value).draw();
+              }
+            });
+          });
+        }
+      });
+
+      $('#tablaDashboard tbody').on('click', '.edit-btn', function () {
+        const tr = $(this).closest('tr');
+        tr.find('[data-campo]').attr('contenteditable', true).addClass('editable');
+        tr.find('.edit-btn').hide();
+        tr.find('.save-btn').show();
+      });
+
+      $('#tablaDashboard tbody').on('click', '.save-btn', function () {
+        const tr = $(this).closest('tr');
+        const consecutivo = tr.find('td:first').text().trim();
+        tr.find('[data-campo]').each(function () {
+          const td = $(this);
+          const campo = td.data('campo');
+          const valor = td.text().trim();
+          fetch('/update-asignacion', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ consecutivo, campo, valor })
+          }).then(r => {
+            if (!r.ok) alert("❌ Error al guardar cambio.");
+          });
+        });
+        tr.find('[data-campo]').removeAttr('contenteditable').removeClass('editable');
+        tr.find('.save-btn').hide();
+        tr.find('.edit-btn').show();
+      });
+    });
+  </script>
+</body>
+</html>

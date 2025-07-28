@@ -9,13 +9,9 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet"/>
 <link href="/static/style_material.css" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<style>
-    body { padding: 2rem; background-color: #fafafa; }
-    .section-divider { margin: 2rem 0 1rem; border-bottom: 1px solid #e0e0e0; }
-  </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </head>
-<body>
+<body class="form-page">
 <div class="container py-4">
 <h4 class="titulo-formulario">Registro de Visita</h4>
 
@@ -27,8 +23,15 @@
 
     <form action="/enviar" class="needs-validation" method="post" novalidate="">
 <!-- Requeridos -->
+<br>
 <div class="input-field">
-<input id="consecutivo" name="consecutivo" required="" type="text"/><label class="" for="consecutivo">Consecutivo *</label>
+  <select id="consecutivo" name="consecutivo" required>
+    <option disabled selected value="">-- Selecciona un consecutivo --</option>
+    {% for c in consecutivos %}
+      <option value="{{ c.consecutivo }}">{{ c.consecutivo }}</option>
+    {% endfor %}
+  </select>
+  <label for="consecutivo">Consecutivo *</label>
 </div>
 <div class="input-field">
 <input id="fecha_formulario" name="fecha_formulario" required="" type="date"/><label class="" for="fecha_formulario">Fecha *</label>
@@ -268,13 +271,13 @@
     url.searchParams.delete("exito");
     window.history.replaceState({}, document.title, url.pathname);
   }
-  </script>
+</script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      var elems = document.querySelectorAll('select');
-      M.FormSelect.init(elems);
-    });
-  </script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('select');
+    M.FormSelect.init(elems);
+  });
+</script>
 <script>
   // Elimina el mensaje después de 5 segundos
   setTimeout(() => {
