@@ -62,6 +62,15 @@ def insertar_visita(data):
         print("⚠️ ERROR al insertar la visita:", e)  # Esto lo verás en la consola del servidor
         raise HTTPException(status_code=500, detail=f"Error al insertar la visita: {e}")
 
+def obtener_municipios():
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute("SELECT id, mpio_cnmbr FROM app.municipio ORDER BY mpio_cnmbr;")
+    municipios = cur.fetchall()
+    cur.close()
+    conn.close()
+    return municipios
+
 class VisitaForm(BaseModel):
     consecutivo: str
     fecha_formulario: str
@@ -105,6 +114,10 @@ class VisitaForm(BaseModel):
         return values
 
 @app.get("/", response_class=HTMLResponse)
+def home(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
+
+@app.get("/form_visita", response_class=HTMLResponse)
 def mostrar_formulario(request: Request, exito: int = 0):
     usuarios = obtener_usuarios()
     return templates.TemplateResponse("form.html", {"request": request, "usuarios": usuarios, "exito": exito})
@@ -157,13 +170,13 @@ async def recibir_formulario(request: Request,
         id_usuario=id_usuario,
     )
     insertar_visita(form)
-    return RedirectResponse("/?exito=1", status_code=303)
+    return RedirectResponse("/form_visita?exito=1", status_code=303)
 
 @app.get("/enviar", include_in_schema=False)
 def redirigir_si_get():
-    return RedirectResponse("/", status_code=303)
+    return RedirectResponse("/form_visita", status_code=303)
 
-@app.get("/mapa", response_class=HTMLResponse)
+@app.get("/geovisor", response_class=HTMLResponse)
 def mostrar_mapa(request: Request):
     return templates.TemplateResponse("mapa.html", {"request": request})
 
@@ -278,4 +291,38 @@ def lista_capas():
     # Devuelve la lista y nombres personalizados
     return [{"id": k, "nombre": v["nombre"], "tipo": v["tipo"]} for k,v in CAPAS.items()]
 
+@app.get("/form_asignacion", response_class=HTMLResponse)
+def mostrar_form_asignacion(request: Request, exito: int = 0):
+    municipios = obtener_municipios()
+    return templates.TemplateResponse(
+        "form_asignacion.html",
+        {"request": request, "municipios": municipios, "exito": exito}
+    )
 
+@app.post("/enviar_asignacion")
+async def recibir_form_asignacion(
+    consecutivo: str = Form(...),
+    fecha_asignacion: str = Form(...),
+    municipio_id: int = Form(...),
+    solo_fotos: Optional[str] = Form(None),  # Recibe "true" si está marcado
+):
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        # Choices.js y HTML envían solo_fotos="true" si está marcado, None si no
+        cur.execute("""
+            INSERT INTO app.asignacion (consecutivo, fecha_asignacion, municipio_id, solo_fotos)
+            VALUES (%s, %s, %s, %s);
+        """, (
+            consecutivo,
+            fecha_asignacion,
+            municipio_id,
+            solo_fotos == "true"
+        ))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return RedirectResponse("/form_asignacion?exito=1", status_code=303)
+    except Exception as e:
+        print("Error al insertar asignacion:", e)
+        raise HTTPException(status_code=500, detail="Error al guardar la asignación.")

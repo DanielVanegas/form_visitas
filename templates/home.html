@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <title>Panel principal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Materialize CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet"/>
+  <link href="/static/style_material.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    body { background: #fafafa; }
+    .main-card {
+      max-width: 450px;
+      margin: 8% auto 0 auto;
+      padding: 2.5rem 2.2rem 2rem 2.2rem;
+      border-radius: 18px;
+      box-shadow: 0 6px 32px rgba(21,101,192,0.09);
+      background: #fff;
+      text-align: center;
+    }
+    .main-card h4 {
+      color: #1565c0;
+      font-weight: 600;
+      font-size: 2.1rem;
+      margin-bottom: 2.3rem;
+      letter-spacing: 0.2px;
+    }
+    .option-btn {
+      width: 175px;
+      height: 125px;
+      margin: 0 0.7rem;
+      border-radius: 14px;
+      background: #e3f2fd;
+      box-shadow: 0 2px 7px rgba(13,71,161,0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #0d47a1;
+      font-weight: 500;
+      font-size: 1.17rem;
+      transition: background .17s, box-shadow .17s;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .option-btn:hover, .option-btn:focus {
+      background: #bbdefb;
+      box-shadow: 0 4px 14px rgba(13,71,161,0.11);
+    }
+    .material-icons {
+      font-size: 2.8rem;
+      margin-bottom: 0.5rem;
+    }
+    @media (max-width: 600px) {
+      .main-card { margin-top: 2.5rem; padding: 1.2rem 0.5rem; }
+      .option-btn { width: 90vw; height: 80px; font-size: 1.03rem; margin: 0.4rem 0;}
+      .options-row { flex-direction: column; align-items: stretch; }
+    }
+    .options-row { display: flex; justify-content: center; gap: 1rem;}
+  </style>
+</head>
+<body>
+  <div class="main-card z-depth-1">
+    <h4>Panel principal</h4>
+    <div class="options-row">
+      <a href="/form_visita" class="option-btn waves-effect">
+        <span class="material-icons">assignment</span>
+        Formulario<br>de Visita
+      </a>
+      <a href="/form_asignacion" class="option-btn waves-effect">
+        <span class="material-icons">assignment_ind</span>
+        Formulario<br>Asignación
+      </a>
+      <a href="/geovisor" class="option-btn waves-effect">
+        <span class="material-icons">map</span>
+        Geovisor
+      </a>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <title>Formulario de Asignación</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet"/>
+  <link href="/static/style_material.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
+  <style>
+    body { background: #fafafa; }
+    .form-card {
+      max-width: 550px;
+      margin: 48px auto;
+      padding: 2.3rem 2.5rem 2rem 2.5rem;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 2px 18px rgba(13,71,161,0.08);
+    }
+    h4.titulo-formulario {
+      margin-bottom: 2.5rem;
+      font-weight: 600;
+      color: #1a237e;
+    }
+    .input-field {
+      margin-bottom: 2.2rem;
+    }
+    .choices__inner { min-height: 3rem; font-size: 1.08rem; }
+    label[for="municipio_id"] {
+      position: relative;
+      left: 0;
+      top: 0;
+      font-size: 1rem;
+      color: #757575;
+      margin-bottom: 0.5rem;
+      display: block;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+    .checkbox-row {
+      margin-bottom: 2.3rem;
+      margin-top: -0.5rem;
+    }
+    .guardar-btn-row {
+      display: flex; justify-content: center; margin-top: 1.5rem;
+    }
+    @media (max-width: 600px) {
+      .form-card { padding: 1.2rem 0.5rem; margin: 20px 0; }
+      h4.titulo-formulario { font-size: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="form-card z-depth-1">
+  <h4 class="titulo-formulario">Asignación de Caso</h4>
+
+  {% if exito == 1 %}
+    <div id="mensaje-exito" class="card-panel green lighten-4 green-text text-darken-4" style="margin-bottom: 1.8rem;">
+      ✅ La asignación fue registrada exitosamente.
+    </div>
+  {% endif %}
+
+  <form action="/enviar_asignacion" method="post">
+    <div class="input-field">
+      <input id="consecutivo" name="consecutivo" required type="text"/>
+      <label for="consecutivo">Consecutivo *</label>
+    </div>
+    <div class="input-field">
+      <input id="fecha_asignacion" name="fecha_asignacion" required type="date"/>
+      <label for="fecha_asignacion">Fecha de asignación *</label>
+    </div>
+    <div class="input-field" style="margin-bottom: 2.2rem;">
+      <label for="municipio_id">Municipio *</label>
+      <select id="municipio_id" name="municipio_id" required>
+        <option disabled selected value="">-- Selecciona un municipio --</option>
+        {% for m in municipios %}
+          <option value="{{ m.id }}">{{ m.mpio_cnmbr }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="checkbox-row">
+      <label>
+        <input type="checkbox" name="solo_fotos" value="true"/>
+        <span>¿Solo fotos?</span>
+      </label>
+    </div>
+    <div class="guardar-btn-row">
+      <button class="btn waves-effect blue darken-3 z-depth-1 hoverable" type="submit">
+        <i class="material-icons left">check</i>
+        GUARDAR
+      </button>
+    </div>
+  </form>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script>
+  // Inicializa Choices en el select de municipio
+  document.addEventListener('DOMContentLoaded', function() {
+    new Choices('#municipio_id', {
+      searchEnabled: true,
+      shouldSort: true,
+      itemSelectText: '',
+      placeholderValue: '-- Selecciona un municipio --',
+      removeItemButton: false,
+      searchPlaceholderValue: 'Buscar municipio...'
+    });
+  });
+</script>
+</body>
+</html>
