@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
 <meta charset="utf-8"/>
@@ -264,30 +263,7 @@
     LIMPIAR
   </button>
 </div>
-<!-- ✅ Elimina ?exito=1 después de mostrar el mensaje -->
-<script>
-  if (window.location.search.includes("exito=1")) {
-    const url = new URL(window.location);
-    url.searchParams.delete("exito");
-    window.history.replaceState({}, document.title, url.pathname);
-  }
-</script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var elems = document.querySelectorAll('select');
-    M.FormSelect.init(elems);
-  });
-</script>
-<script>
-  // Elimina el mensaje después de 5 segundos
-  setTimeout(() => {
-    const mensaje = document.getElementById("mensaje-exito");
-    if (mensaje) {
-      mensaje.style.transition = "opacity 0.5s ease";
-      mensaje.style.opacity = 0;
-      setTimeout(() => mensaje.remove(), 500);  // Remueve el nodo después de desvanecerse
-    }
-  }, 5000); // 5000 ms = 5 segundos
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script src="/static/main.js"></script>
 </body>
 </html>
