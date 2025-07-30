@@ -8,52 +8,38 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="/static/style_material.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <style>
-    /* Colores de fondo por estado */
-    .estado-entregado { background-color: #e8f5e9; }
-    .estado-por-visitar { background-color: #fffde7; }
-    .estado-por-agendar { background-color: #fff3e0; }
-    .estado-con-novedad { background-color: #ffebee; }
-    .estado-por-montar { background-color: #e3f2fd; }
-
-    table td, table th {
-      vertical-align: middle;
-    }
-
-    .search-container {
-      margin: 1rem 0;
-    }
-
-    .btn-small i.material-icons {
-      font-size: 18px;
-    }
-
-    thead input {
-      width: 100%;
-      border: none;
-      border-bottom: 1px solid #ccc;
-      padding: 4px;
-      font-size: 0.9rem;
-      background: transparent;
-    }
-
-    .edit-btn, .save-btn {
-      cursor: pointer;
-      margin-right: 4px;
-    }
-
-    .dataTables_length, .dataTables_info, .dataTables_paginate {
-      display: none;
-    }
-
-    .material-symbols-outlined {
-      vertical-align: middle;
-    }
-  </style>
 </head>
-<body class="grey lighten-4">
-  <div class="container">
-    <h4 class="center-align"><i class="material-icons">bar_chart</i> Dashboard Asignaciones</h4>
+<body class="form-page">
+  <div class="dashboard-card">
+    <div style="position: relative;">
+
+      <!-- Botón volver -->
+      <a href="/" title="Volver al Panel" class="btn-flat"
+        style="position: absolute; top: 0.4rem; left: 0.6rem; min-width: 40px; z-index: 10;">
+        <span class="material-icons" style="font-size: 1.7em;">arrow_back</span>
+      </a>
+
+      <div class="dashboard-toolbar">
+        <!-- Input animado oculto -->
+        <input id="buscador-global" type="search" placeholder="Buscar..." class="input-buscador-animado" />
+
+        <!-- Botón lupa -->
+        <button id="toggle-buscador" type="button" class="btn-flat" title="Buscar">
+          <span class="material-icons" style="font-size: 1.7em;">search</span>
+        </button>
+
+        <!-- Botón modo oscuro -->
+        <button id="modo-oscuro" type="button" class="btn-flat" title="Modo oscuro">
+          <span class="material-icons" style="font-size: 1.7em;">dark_mode</span>
+        </button>
+      </div>
+
+      <!-- Título centrado -->
+      <h4 class="titulo-formulario" style="margin:0;">
+        <span class="material-icons" style="vertical-align:-10px; font-size:1.35em; margin-right:7px; color:var(--color-primary);">bar_chart</span>
+        <span class="titulo-formulario-texto">Dashboard Asignaciones</span>
+      </h4>
+    </div>
 
     <table id="tablaDashboard" class="striped highlight responsive-table">
       <thead>
@@ -115,56 +101,8 @@
       </tbody>
     </table>
   </div>
-
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-  <script>
-    $(document).ready(function () {
-      const tabla = $('#tablaDashboard').DataTable({
-        paging: false,
-        order: [[1, "desc"]],
-        language: {
-          url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
-        },
-        initComplete: function () {
-          this.api().columns().every(function () {
-            var that = this;
-            $('input', this.header()).on('keyup change clear', function () {
-              if (that.search() !== this.value) {
-                that.search(this.value).draw();
-              }
-            });
-          });
-        }
-      });
-
-      $('#tablaDashboard tbody').on('click', '.edit-btn', function () {
-        const tr = $(this).closest('tr');
-        tr.find('[data-campo]').attr('contenteditable', true).addClass('editable');
-        tr.find('.edit-btn').hide();
-        tr.find('.save-btn').show();
-      });
-
-      $('#tablaDashboard tbody').on('click', '.save-btn', function () {
-        const tr = $(this).closest('tr');
-        const consecutivo = tr.find('td:first').text().trim();
-        tr.find('[data-campo]').each(function () {
-          const td = $(this);
-          const campo = td.data('campo');
-          const valor = td.text().trim();
-          fetch('/update-asignacion', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ consecutivo, campo, valor })
-          }).then(r => {
-            if (!r.ok) alert("❌ Error al guardar cambio.");
-          });
-        });
-        tr.find('[data-campo]').removeAttr('contenteditable').removeClass('editable');
-        tr.find('.save-btn').hide();
-        tr.find('.edit-btn').show();
-      });
-    });
-  </script>
+  <script src="/static/main.js"></script>
 </body>
 </html>

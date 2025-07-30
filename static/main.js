@@ -22,3 +22,108 @@ setTimeout(() => {
     setTimeout(() => mensaje.remove(), 500);  // Remueve el nodo después de desvanecerse
   }
 }, 5000);
+
+// Aplica modo oscuro si ya está guardado
+if (localStorage.getItem('darkMode') === '1') {
+  document.body.classList.add('dark-mode');
+}
+
+document.getElementById("modo-oscuro").addEventListener("click", function() {
+  document.body.classList.toggle("dark-mode");
+  localStorage.setItem('darkMode', document.body.classList.contains("dark-mode") ? '1' : '0');
+});
+
+function updateDarkModeIcon() {
+  document.getElementById("modo-oscuro").querySelector("span")
+    .textContent = document.body.classList.contains("dark-mode") ? "light_mode" : "dark_mode";
+}
+
+// Llama al inicio y cada vez que se haga click
+updateDarkModeIcon();
+document.getElementById("modo-oscuro").addEventListener("click", function() {
+  updateDarkModeIcon();
+});
+
+$(document).ready(function () {
+  const tablaElement = $('#tablaDashboard');
+  if (!tablaElement.length) return; // ✅ Si no hay tabla, salir
+
+  const tabla = tablaElement.DataTable({
+    paging: false,
+    order: [[1, "desc"]],
+    language: {
+      url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+    },
+    initComplete: function () {
+      this.api().columns().every(function () {
+        var that = this;
+        $('input', this.header()).on('keyup change clear', function () {
+          if (that.search() !== this.value) {
+            that.search(this.value).draw();
+          }
+        });
+      });
+    }
+  });
+
+  // 🖊️ Editar celdas
+  tablaElement.on('click', '.edit-btn', function () {
+    const tr = $(this).closest('tr');
+    tr.find('[data-campo]').attr('contenteditable', true).addClass('editable');
+    tr.find('.edit-btn').hide();
+    tr.find('.save-btn').show();
+  });
+
+  // 💾 Guardar cambios
+  tablaElement.on('click', '.save-btn', function () {
+    const tr = $(this).closest('tr');
+    const consecutivo = tr.find('td:first').text().trim();
+    tr.find('[data-campo]').each(function () {
+      const td = $(this);
+      const campo = td.data('campo');
+      const valor = td.text().trim();
+      fetch('/update-asignacion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ consecutivo, campo, valor })
+      }).then(r => {
+        if (!r.ok) alert("❌ Error al guardar cambio.");
+      });
+    });
+    tr.find('[data-campo]').removeAttr('contenteditable').removeClass('editable');
+    tr.find('.save-btn').hide();
+    tr.find('.edit-btn').show();
+  });
+
+  // 🔍 Buscador global con lupa (con clase visible animada)
+  const toggleBtn = document.getElementById("toggle-buscador");
+  const input = document.getElementById("buscador-global");
+
+  if (toggleBtn && input) {
+    toggleBtn.addEventListener("click", () => {
+      const isVisible = input.classList.contains("visible");
+
+      if (isVisible) {
+        input.classList.remove("visible");
+        input.value = "";
+        tabla.search("").draw();
+      } else {
+        input.classList.add("visible");
+        input.focus();
+      }
+    });
+
+    input.addEventListener("input", () => {
+      tabla.search(input.value).draw();
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        input.classList.remove("visible");
+        input.value = "";
+        tabla.search("").draw();
+      }
+    });
+  }
+});
+

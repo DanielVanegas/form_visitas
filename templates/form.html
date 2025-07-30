@@ -11,258 +11,277 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </head>
 <body class="form-page">
-<div class="container py-4">
-<h4 class="titulo-formulario">Registro de Visita</h4>
+  <div class="form-card z-depth-1">
+    <div style="position: relative;">
+      <a href="/" title="Volver al Panel" class="btn-flat"
+        style="position: absolute; top: 0.4rem; left: 0.6rem; min-width: 40px; z-index: 10;">
+        <span class="material-icons" style="font-size: 1.7em;">arrow_back</span>
+      </a>
+      <button id="modo-oscuro" type="button" class="btn-flat"
+        title="Modo oscuro"
+        style="position: absolute; top: 0.4rem; right: 0.6rem; min-width: 40px; z-index: 10;">
+        <span class="material-icons" style="font-size:1.7em;">dark_mode</span>
+      </button>
+      <h4 class="titulo-formulario" style="margin:0;">
+        <span class="material-icons" style="vertical-align:-10px; font-size:1.35em; margin-right:7px; color:var(--color-primary);">assignment</span>
+        <span class="titulo-formulario-texto">Registro de Visita</span>
+      </h4>
+    </div>
 
-    {% if exito == 1 %}
-      <div id="mensaje-exito" class="card-panel green lighten-4 green-text text-darken-4">
-        ✅ La visita fue registrada exitosamente.
-      </div>
-    {% endif %}
+        {% if exito == 1 %}
+          <div id="mensaje-exito" class="card-panel green lighten-4 green-text text-darken-4" style="margin-bottom: 1.1rem; font-size:1.07rem; display: flex; align-items: center;">
+            <span class="material-icons" style="margin-right: 8px; font-size: 1.6em; color: #388e3c;">check_circle</span>
+            La visita fue registrada exitosamente.
+          </div>
+        {% endif %}
 
-    <form action="/enviar" class="needs-validation" method="post" novalidate="">
-<!-- Requeridos -->
-<br>
-<div class="input-field">
-  <select id="consecutivo" name="consecutivo" required>
-    <option disabled selected value="">-- Selecciona un consecutivo --</option>
-    {% for c in consecutivos %}
-      <option value="{{ c.consecutivo }}">{{ c.consecutivo }}</option>
-    {% endfor %}
-  </select>
-  <label for="consecutivo">Consecutivo *</label>
-</div>
-<div class="input-field">
-<input id="fecha_formulario" name="fecha_formulario" required="" type="date"/><label class="" for="fecha_formulario">Fecha *</label>
-</div>
-<div class="input-field">
-<input id="coordenadas" name="coordenadas" placeholder="Ej: 4.6537, -74.0836" required="" type="text"/><label class="" for="coordenadas">Coordenadas (lat, lon) *</label>
-</div>
-<!-- Opcionales -->
-<div class="input-field">
-<input id="nombre_solicitante" name="nombre_solicitante" type="text"/><label class="" for="nombre_solicitante">Nombre solicitante</label>
-</div>
-<div class="row">
-<div class="input-field">
-<input id="al_sur" name="al_sur" type="text"/><label class="" for="al_sur">Al sur</label>
-</div>
-<div class="input-field">
-<input id="al_norte" name="al_norte" type="text"/><label class="" for="al_norte">Al norte</label>
-</div>
-<div class="input-field">
-<input id="al_occidente" name="al_occidente" type="text"/><label class="" for="al_occidente">Al occidente</label>
-</div>
-<div class="input-field">
-<input id="al_oriente" name="al_oriente" type="text"/><label class="" for="al_oriente">Al oriente</label>
-</div>
-</div>
-
-<!-- Radios sin required -->
-<div class="row">
-  <p>Sector</p>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="sector" type="radio" value="consolidado de uso residencial en vivienda multifamiliar." />
-      <span>consolidado de uso residencial en vivienda multifamiliar.</span>
-    </label>
-  </div>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="sector" type="radio" value="consolidado de uso residencial en vivienda unifamiliar." />
-      <span>consolidado de uso residencial en vivienda unifamiliar.</span>
-    </label>
-  </div>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="sector" type="radio" value="en crecimiento. Se presentan nuevos desarrollos de vivienda en altura sometidos a régimen de propiedad horizontal." />
-      <span>en crecimiento. Se presentan nuevos desarrollos de vivienda en altura sometidos a régimen de propiedad horizontal.</span>
-    </label>
-  </div>
-</div>
-
-<div class="row">
-  <p>Edificio</p>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="edificio" type="radio" value="Edificio" />
-      <span>Edificio</span>
-    </label>
-  </div>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="edificio" type="radio" value="Conjunto residencial" />
-      <span>Conjunto residencial</span>
-    </label>
-  </div>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="edificio" type="radio" value="Casa" />
-      <span>Casa</span>
-    </label>
-  </div>
-</div>
-
-<div class="row">
-  <p>Lote</p>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="lote" type="radio" value="medianero" />
-      <span>medianero</span>
-    </label>
-  </div>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="lote" type="radio" value="esquinero" />
-      <span>esquinero</span>
-    </label>
-  </div>
-</div>
-
-<div class="row">
-  <p>Tipología</p>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="tipologia" type="radio" value="continua" />
-      <span>continua</span>
-    </label>
-  </div>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="tipologia" type="radio" value="aislada" />
-      <span>aislada</span>
-    </label>
-  </div>
-</div>
-
-<div class="row">
-  <p>Topografía</p>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="topografia" type="radio" value="plana" />
-      <span>plana</span>
-    </label>
-  </div>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="topografia" type="radio" value="ligera" />
-      <span>ligera</span>
-    </label>
-  </div>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="topografia" type="radio" value="inclinada" />
-      <span>inclinada</span>
-    </label>
-  </div>
-</div>
-
-<div class="row">
-  <p>Sótanos</p>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="sotanos" type="radio" value="1" />
-      <span>1</span>
-    </label>
-  </div>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="sotanos" type="radio" value="2" />
-      <span>2</span>
-    </label>
-  </div>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="sotanos" type="radio" value="3" />
-      <span>3</span>
-    </label>
-  </div>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="sotanos" type="radio" value="4" />
-      <span>4</span>
-    </label>
-  </div>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="sotanos" type="radio" value="sin" />
-      <span>sin</span>
-    </label>
-  </div>
-</div>
-
-<div class="row">
-  <p>Zonas comunes</p>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="zonas_comunes" type="radio" value="variadas para su estrato y ubicación" />
-      <span>variadas para su estrato y ubicación</span>
-    </label>
-  </div>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="zonas_comunes" type="radio" value="típicas para su estrato y ubicación" />
-      <span>típicas para su estrato y ubicación</span>
-    </label>
-  </div>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="zonas_comunes" type="radio" value="limitadas para su estrato y ubicación" />
-      <span>limitadas para su estrato y ubicación</span>
-    </label>
-  </div>
-</div>
-
-<div class="row">
-  <p>Vista</p>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="vista" type="radio" value="interior" />
-      <span>interior</span>
-    </label>
-  </div>
-  <div class="col s12">
-    <label>
-      <input class="with-gap" name="vista" type="radio" value="exterior" />
-      <span>exterior</span>
-    </label>
-  </div>
-</div>
-
-<!-- Otros campos -->
-<div class="input-field">
-<input id="construccion" name="construccion" type="text"/><label class="" for="construccion">Construcción (número de pisos)</label>
-</div>
-<div class="input-field">
-<input id="piso" name="piso" type="text"/><label class="" for="piso">Piso (ubicación)</label>
-</div>
-<div class="input-field">
-<input id="formato_url" name="formato_url" type="text"/><label class="" for="formato_url">Formato URL</label>
-</div>
-<div class="input-field">
-<input id="plano_url" name="plano_url" type="text"/><label class="" for="plano_url">Plano URL</label>
-</div>
-<div class="mb-3">
-<label class="">Usuario responsable</label>
-<select class="browser-default" name="id_usuario">
-<option disabled="" selected="" value="">-- Selecciona una opción --</option>
-          {% for usuario in usuarios %}
-            <option value="{{ usuario.id_usuario }}">{{ usuario.nombre }}</option>
+        <form action="/enviar" class="needs-validation" method="post" novalidate="">
+    <div class="section-divider">
+      <!-- Requeridos -->
+      <div class="input-field">
+        <select id="consecutivo" name="consecutivo" required>
+          <option disabled selected value=""></option>
+          {% for c in consecutivos %}
+            <option value="{{ c.consecutivo }}">{{ c.consecutivo }}</option>
           {% endfor %}
         </select>
-</div>
-<br>
-<!-- Botones -->
-<div class="center-align">
-  <button class="btn waves-effect blue darken-3 z-depth-1 hoverable" type="submit">
-    <i class="material-icons left" style="line-height: inherit; font-size: 20px;">check</i>
-    GUARDAR
-  </button>
+        <label for="consecutivo">Consecutivo *</label>
+      </div>
+      <div class="input-field">
+        <input id="fecha_formulario" name="fecha_formulario" required="" type="date"/><label class="" for="fecha_formulario">Fecha *</label>
+      </div>
+      <div class="input-field">
+        <input id="coordenadas" name="coordenadas" required="" type="text"/><label class="" for="coordenadas">Coordenadas (lat, lon) *</label>
+      </div>
+      <!-- Opcionales -->
+      <div class="input-field">
+        <input id="nombre_solicitante" name="nombre_solicitante" type="text"/><label class="" for="nombre_solicitante">Nombre solicitante</label>
+      </div>
+      <div class="row">
+        <div class="input-field">
+          <input id="al_sur" name="al_sur" type="text"/><label class="" for="al_sur">Al sur</label>
+        </div>
+        <div class="input-field">
+          <input id="al_norte" name="al_norte" type="text"/><label class="" for="al_norte">Al norte</label>
+        </div>
+        <div class="input-field">
+          <input id="al_occidente" name="al_occidente" type="text"/><label class="" for="al_occidente">Al occidente</label>
+        </div>
+        <div class="input-field">
+          <input id="al_oriente" name="al_oriente" type="text"/><label class="" for="al_oriente">Al oriente</label>
+        </div>
+      </div>
+    </div>
 
-  <button class="btn grey lighten-2 black-text z-depth-1 hoverable" type="reset">
-    <i class="material-icons left" style="line-height: inherit; font-size: 20px;">delete_sweep</i>
-    LIMPIAR
-  </button>
-</div>
+    <div class="section-divider">
+      <!-- Radios sin required -->
+      <div class="row">
+        <p>Sector</p>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="sector" type="radio" value="consolidado de uso residencial en vivienda multifamiliar." />
+            <span>consolidado de uso residencial en vivienda multifamiliar.</span>
+          </label>
+        </div>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="sector" type="radio" value="consolidado de uso residencial en vivienda unifamiliar." />
+            <span>consolidado de uso residencial en vivienda unifamiliar.</span>
+          </label>
+        </div>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="sector" type="radio" value="en crecimiento. Se presentan nuevos desarrollos de vivienda en altura sometidos a régimen de propiedad horizontal." />
+            <span>en crecimiento. Se presentan nuevos desarrollos de vivienda en altura sometidos a régimen de propiedad horizontal.</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="row">
+        <p>Edificio</p>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="edificio" type="radio" value="Edificio" />
+            <span>Edificio</span>
+          </label>
+        </div>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="edificio" type="radio" value="Conjunto residencial" />
+            <span>Conjunto residencial</span>
+          </label>
+        </div>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="edificio" type="radio" value="Casa" />
+            <span>Casa</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="row">
+        <p>Lote</p>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="lote" type="radio" value="medianero" />
+            <span>medianero</span>
+          </label>
+        </div>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="lote" type="radio" value="esquinero" />
+            <span>esquinero</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="row">
+        <p>Tipología</p>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="tipologia" type="radio" value="continua" />
+            <span>continua</span>
+          </label>
+        </div>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="tipologia" type="radio" value="aislada" />
+            <span>aislada</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="row">
+        <p>Topografía</p>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="topografia" type="radio" value="plana" />
+            <span>plana</span>
+          </label>
+        </div>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="topografia" type="radio" value="ligera" />
+            <span>ligera</span>
+          </label>
+        </div>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="topografia" type="radio" value="inclinada" />
+            <span>inclinada</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="row">
+        <p>Sótanos</p>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="sotanos" type="radio" value="1" />
+            <span>1</span>
+          </label>
+        </div>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="sotanos" type="radio" value="2" />
+            <span>2</span>
+          </label>
+        </div>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="sotanos" type="radio" value="3" />
+            <span>3</span>
+          </label>
+        </div>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="sotanos" type="radio" value="4" />
+            <span>4</span>
+          </label>
+        </div>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="sotanos" type="radio" value="sin" />
+            <span>sin</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="row">
+        <p>Zonas comunes</p>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="zonas_comunes" type="radio" value="variadas para su estrato y ubicación" />
+            <span>variadas para su estrato y ubicación</span>
+          </label>
+        </div>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="zonas_comunes" type="radio" value="típicas para su estrato y ubicación" />
+            <span>típicas para su estrato y ubicación</span>
+          </label>
+        </div>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="zonas_comunes" type="radio" value="limitadas para su estrato y ubicación" />
+            <span>limitadas para su estrato y ubicación</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="row">
+        <p>Vista</p>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="vista" type="radio" value="interior" />
+            <span>interior</span>
+          </label>
+        </div>
+        <div class="col s12">
+          <label>
+            <input class="with-gap" name="vista" type="radio" value="exterior" />
+            <span>exterior</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Otros campos -->
+    <div class="input-field">
+      <input id="construccion" name="construccion" type="text"/><label class="" for="construccion">Construcción (número de pisos)</label>
+    </div>
+    <div class="input-field">
+      <input id="piso" name="piso" type="text"/><label class="" for="piso">Piso (ubicación)</label>
+    </div>
+    <div class="input-field">
+      <input id="formato_url" name="formato_url" type="text"/><label class="" for="formato_url">Formato URL</label>
+    </div>
+    <div class="input-field">
+      <input id="plano_url" name="plano_url" type="text"/><label class="" for="plano_url">Plano URL</label>
+    </div>
+    <div class="mb-3">
+      <label class="">Usuario responsable</label>
+      <select class="browser-default" name="id_usuario">
+      <option disabled="" selected="" value="">-- Selecciona una opción --</option>
+                {% for usuario in usuarios %}
+                  <option value="{{ usuario.id_usuario }}">{{ usuario.nombre }}</option>
+                {% endfor %}
+              </select>
+    </div>
+    <br>
+    <!-- Botones -->
+    <div class="center-align">
+      <button class="btn waves-effect blue darken-3 z-depth-1 hoverable" type="submit">
+        <i class="material-icons left" style="line-height: inherit; font-size: 20px;">check</i>
+        GUARDAR
+      </button>
+
+      <button class="btn grey lighten-2 black-text z-depth-1 hoverable" type="reset">
+        <i class="material-icons left" style="line-height: inherit; font-size: 20px;">delete_sweep</i>
+        LIMPIAR
+      </button>
+    </div>
+  </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 <script src="/static/main.js"></script>
 </body>
