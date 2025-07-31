@@ -359,3 +359,53 @@ body.dark-mode .estado-por-montar {
   opacity: 1;
   padding: 0.25rem 0.65rem;
 }
+
+/* --- Botones de acción en tabla --- */
+.btn-edit,
+.btn-save {
+  background: transparent;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-edit i {
+  color: var(--color-primary);
+}
+.btn-save i {
+  color: #2e7d32; /* verde material */
+}
+
+.btn-edit:hover,
+.btn-save:hover {
+  background: rgba(21, 101, 192, 0.08); /* suave azul */
+}
+
+/* Fila en modo edición */
+tr.modo-edicion {
+  background-color: rgba(33, 150, 243, 0.05); /* azul claro */
+}
+body.dark-mode tr.modo-edicion {
+  background-color: rgba(66, 165, 245, 0.08); /* más visible en dark */
+}
+
+.btn-localizador {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ef6c00; /* Naranja Material */
+  transition: background 0.2s ease;
+}
+
+.btn-localizador:hover {
+  background: rgba(255, 152, 0, 0.1); /* naranja suave */
+}

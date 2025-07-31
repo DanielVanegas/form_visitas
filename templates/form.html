@@ -39,13 +39,13 @@
     <div class="section-divider">
       <!-- Requeridos -->
       <div class="input-field">
-        <select id="consecutivo" name="consecutivo" required>
+        <select id="id_asignacion" name="id_asignacion" required>
           <option disabled selected value=""></option>
           {% for c in consecutivos %}
-            <option value="{{ c.consecutivo }}">{{ c.consecutivo }}</option>
+            <option value="{{ c.id }}">{{ c.id }} – {{ c.consecutivo }}</option>
           {% endfor %}
         </select>
-        <label for="consecutivo">Consecutivo *</label>
+        <label for="id_asignacion">Consecutivo *</label>
       </div>
       <div class="input-field">
         <input id="fecha_formulario" name="fecha_formulario" required="" type="date"/><label class="" for="fecha_formulario">Fecha *</label>

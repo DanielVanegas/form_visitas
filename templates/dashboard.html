@@ -87,14 +87,18 @@
           <td>{{ '✅' if a.solo_fotos else '' }}</td>
           <td>
             {% if a.fecha_entrega %}
-              <a href="/geovisor?consecutivo={{ a.consecutivo }}" class="btn-small orange" target="_blank">
+              <a href="/geovisor?consecutivo={{ a.consecutivo }}" class="btn-localizador tooltipped" data-tooltip="Ver en geovisor" target="_blank">
                 <i class="material-icons">location_on</i>
               </a>
             {% endif %}
           </td>
           <td>
-            <button class="btn-small blue lighten-1 edit-btn"><i class="material-icons">edit</i></button>
-            <button class="btn-small green lighten-1 save-btn" style="display: none;"><i class="material-icons">save</i></button>
+            <button class="btn-flat waves-effect edit-btn tooltipped" data-tooltip="Editar fila" style="color: #1565c0;">
+              <i class="material-icons">edit</i>
+            </button>
+            <button class="btn-flat waves-effect save-btn tooltipped" data-tooltip="Guardar cambios" style="display: none; color: #2e7d32;">
+              <i class="material-icons">check</i>
+            </button>
           </td>
         </tr>
         {% endfor %}

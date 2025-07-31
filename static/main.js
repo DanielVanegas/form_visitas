@@ -45,6 +45,7 @@ document.getElementById("modo-oscuro").addEventListener("click", function() {
 });
 
 $(document).ready(function () {
+  M.Tooltip.init(document.querySelectorAll('.tooltipped'));
   const tablaElement = $('#tablaDashboard');
   if (!tablaElement.length) return; // ✅ Si no hay tabla, salir
 
@@ -66,18 +67,20 @@ $(document).ready(function () {
     }
   });
 
-  // 🖊️ Editar celdas
+  // 🖊️ Editar celdas (Material Design)
   tablaElement.on('click', '.edit-btn', function () {
     const tr = $(this).closest('tr');
     tr.find('[data-campo]').attr('contenteditable', true).addClass('editable');
+    tr.addClass('modo-edicion');
     tr.find('.edit-btn').hide();
     tr.find('.save-btn').show();
   });
 
-  // 💾 Guardar cambios
+  // 💾 Guardar cambios (Material Design)
   tablaElement.on('click', '.save-btn', function () {
     const tr = $(this).closest('tr');
     const consecutivo = tr.find('td:first').text().trim();
+
     tr.find('[data-campo]').each(function () {
       const td = $(this);
       const campo = td.data('campo');
@@ -90,7 +93,9 @@ $(document).ready(function () {
         if (!r.ok) alert("❌ Error al guardar cambio.");
       });
     });
+
     tr.find('[data-campo]').removeAttr('contenteditable').removeClass('editable');
+    tr.removeClass('modo-edicion');
     tr.find('.save-btn').hide();
     tr.find('.edit-btn').show();
   });

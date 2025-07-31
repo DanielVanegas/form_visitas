@@ -78,13 +78,17 @@ def obtener_consecutivos_pendientes():
     conn = get_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
     cur.execute("""
-        SELECT a.consecutivo, a.fecha_asignacion
+        SELECT a.id, a.consecutivo, a.fecha_asignacion
         FROM app.asignacion a
-        LEFT JOIN app.visita v ON a.consecutivo = v.consecutivo
-        WHERE v.consecutivo IS NULL
+        LEFT JOIN app.visita v ON a.id = v.id_asignacion
+        WHERE v.id_asignacion IS NULL
             AND a.fecha_asignacion IS NOT NULL
+            AND a.fecha_visita IS NOT NULL
+            AND a.hora_visita IS NOT NULL
+            AND (a.fecha_visita + a.hora_visita)::timestamp <= NOW()
             AND a.fecha_entrega IS NULL
-        ORDER BY a.fecha_asignacion DESC
+            AND a.solo_fotos IS FALSE
+        ORDER BY a.fecha_visita ASC, a.hora_visita ASC
     """)
     consecutivos = cur.fetchall()
     cur.close()
