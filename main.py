@@ -43,14 +43,14 @@ def insertar_visita(data):
         cur = conn.cursor()
         cur.execute("""
             INSERT INTO app.visita (
-                consecutivo, fecha_formulario, latitud, longitud,
+                id_asignacion, fecha_formulario, latitud, longitud,
                 nombre_solicitante, al_sur, al_norte, al_occidente, al_oriente,
                 sector, edificio, lote, tipologia, topografia, construccion,
                 sotanos, zonas_comunes, piso, vista,
                 formato_url, plano_url, id_usuario
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         """, (
-            data.consecutivo, data.fecha_formulario, data.latitud, data.longitud,
+            data.id_asignacion, data.fecha_formulario, data.latitud, data.longitud,
             data.nombre_solicitante, data.al_sur, data.al_norte, data.al_occidente, data.al_oriente,
             data.sector, data.edificio, data.lote, data.tipologia, data.topografia, data.construccion,
             data.sotanos, data.zonas_comunes, data.piso, data.vista,
@@ -96,7 +96,7 @@ def obtener_consecutivos_pendientes():
     return consecutivos
 
 class VisitaForm(BaseModel):
-    consecutivo: str
+    id_asignacion: int
     fecha_formulario: str
     coordenadas: str
     latitud: float
@@ -154,7 +154,7 @@ def mostrar_formulario(request: Request, exito: int = 0):
 
 @app.post("/enviar")
 async def recibir_formulario(request: Request,
-    consecutivo: str = Form(...),
+    id_asignacion: int = Form(...),
     fecha_formulario: str = Form(...),
     coordenadas: str = Form(...),
     nombre_solicitante: Optional[str] = Form(None),
@@ -177,7 +177,7 @@ async def recibir_formulario(request: Request,
     id_usuario: int = Form(None),
 ):
     form = VisitaForm(
-        consecutivo=consecutivo,
+        id_asignacion=id_asignacion,
         fecha_formulario=fecha_formulario,
         coordenadas=coordenadas,
         nombre_solicitante=nombre_solicitante,
