@@ -242,14 +242,16 @@ CAPAS = {
         "nombre": "Avalúos",
         "sql": """
             SELECT 
-                consecutivo, 
-                area_privada, 
-                TO_CHAR(valor_m2, '$999G999G999') as valor_m2, 
-                direccion, 
-                vetustez,
-                ST_AsGeoJSON(geom)::json as geom 
-            FROM app.avaluo 
-            WHERE geom IS NOT NULL
+                a.consecutivo, 
+                av.area_privada, 
+                TO_CHAR(av.valor_m2, '$999G999G999') as valor_m2, 
+                av.direccion, 
+                av.vetustez,
+                ST_AsGeoJSON(av.geom)::json as geom 
+            FROM app.avaluo av
+            JOIN app.visita v ON av.id_visita = v.id_visita
+            JOIN app.asignacion a ON v.id_asignacion = a.id
+            WHERE av.geom IS NOT NULL
         """
     },
     "barrios": {
