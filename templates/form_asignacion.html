@@ -42,6 +42,10 @@
         <label for="fecha_asignacion">Fecha de asignación *</label>
       </div>
       <div class="input-field">
+        <input id="coordenadas" name="coordenadas" required="" type="text"/>
+        <label class="" for="coordenadas">Coordenadas (lat, lon) *</label>
+      </div>
+      <div class="input-field">
         <select id="municipio_id" name="municipio_id" required>
           <option disabled selected value="">-- Selecciona un municipio --</option>
           {% for m in municipios %}

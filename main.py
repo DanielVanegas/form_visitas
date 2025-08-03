@@ -43,14 +43,14 @@ def insertar_visita(data):
         cur = conn.cursor()
         cur.execute("""
             INSERT INTO app.visita (
-                id_asignacion, fecha_formulario, latitud, longitud,
+                id_asignacion, fecha_formulario,
                 nombre_solicitante, al_sur, al_norte, al_occidente, al_oriente,
                 sector, edificio, lote, tipologia, topografia, construccion,
                 sotanos, zonas_comunes, piso, vista,
                 formato_url, plano_url, id_usuario
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         """, (
-            data.id_asignacion, data.fecha_formulario, data.latitud, data.longitud,
+            data.id_asignacion, data.fecha_formulario,
             data.nombre_solicitante, data.al_sur, data.al_norte, data.al_occidente, data.al_oriente,
             data.sector, data.edificio, data.lote, data.tipologia, data.topografia, data.construccion,
             data.sotanos, data.zonas_comunes, data.piso, data.vista,
@@ -62,7 +62,7 @@ def insertar_visita(data):
     except IntegrityError as e:
         raise HTTPException(status_code=400, detail="Consecutivo duplicado u otro error de integridad.")
     except Exception as e:
-        print("⚠️ ERROR al insertar la visita:", e)  # Esto lo verás en la consola del servidor
+        print("⚠️ ERROR al insertar la visita:", e)
         raise HTTPException(status_code=500, detail=f"Error al insertar la visita: {e}")
 
 def obtener_municipios():
@@ -98,10 +98,6 @@ def obtener_consecutivos_pendientes():
 class VisitaForm(BaseModel):
     id_asignacion: int
     fecha_formulario: str
-    coordenadas: str
-    latitud: float
-    longitud: float
-
     nombre_solicitante: Optional[str] = None
     al_sur: Optional[str] = None
     al_norte: Optional[str] = None
@@ -120,22 +116,6 @@ class VisitaForm(BaseModel):
     formato_url: Optional[str] = None
     plano_url: Optional[str] = None
     id_usuario: Optional[int] = None
-
-    @root_validator(pre=True)
-    def separar_latitud_y_longitud(cls, values):
-        coords = values.get("coordenadas")
-        if coords:
-            partes = coords.split(",")
-            if len(partes) != 2:
-                raise ValueError("Formato inválido, usar: lat, lon")
-            try:
-                lat = float(partes[0].strip())
-                lon = float(partes[1].strip())
-            except ValueError:
-                raise ValueError("Las coordenadas deben ser números")
-            values["latitud"] = lat
-            values["longitud"] = lon
-        return values
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
@@ -156,7 +136,6 @@ def mostrar_formulario(request: Request, exito: int = 0):
 async def recibir_formulario(request: Request,
     id_asignacion: int = Form(...),
     fecha_formulario: str = Form(...),
-    coordenadas: str = Form(...),
     nombre_solicitante: Optional[str] = Form(None),
     al_sur: Optional[str] = Form(None),
     al_norte: Optional[str] = Form(None),
@@ -179,7 +158,6 @@ async def recibir_formulario(request: Request,
     form = VisitaForm(
         id_asignacion=id_asignacion,
         fecha_formulario=fecha_formulario,
-        coordenadas=coordenadas,
         nombre_solicitante=nombre_solicitante,
         al_sur=al_sur,
         al_norte=al_norte,
@@ -293,6 +271,18 @@ CAPAS = {
         "tipo": "polygon",
         "nombre": "Tratamientos Urbanísticos",
         "sql": "SELECT nombre_tratamiento, tipologia, altura_maxima, ST_AsGeoJSON(geom)::json as geom FROM app.tratamientos WHERE geom IS NOT NULL"
+    },
+    "asignacion": {
+    "tabla": "app.asignacion",
+    "tipo": "point",
+    "nombre": "Asignaciones",
+    "sql": """
+        SELECT 
+            consecutivo, 
+            ST_AsGeoJSON(geom)::json AS geom
+        FROM app.asignacion
+        WHERE geom IS NOT NULL AND fecha_visita IS NULL
+    """
     }
 }
 
@@ -336,25 +326,41 @@ async def recibir_form_asignacion(
     consecutivo: str = Form(...),
     fecha_asignacion: str = Form(...),
     municipio_id: int = Form(...),
-    solo_fotos: Optional[str] = Form(None),  # Recibe "true" si está marcado
+    coordenadas: str = Form(...),
+    solo_fotos: Optional[str] = Form(None),
 ):
     try:
+        # Validación directa de coordenadas
+        partes = coordenadas.split(",")
+        if len(partes) != 2:
+            raise HTTPException(status_code=400, detail="Formato inválido: usar 'lat, lon'")
+        
+        try:
+            lat = float(partes[0].strip())
+            lon = float(partes[1].strip())
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Las coordenadas deben ser números")
+        
         conn = get_connection()
         cur = conn.cursor()
-        # Choices.js y HTML envían solo_fotos="true" si está marcado, None si no
         cur.execute("""
-            INSERT INTO app.asignacion (consecutivo, fecha_asignacion, municipio_id, solo_fotos)
-            VALUES (%s, %s, %s, %s);
+            INSERT INTO app.asignacion (consecutivo, fecha_asignacion, municipio_id, solo_fotos, latitud, longitud)
+            VALUES (%s, %s, %s, %s, %s, %s);
         """, (
             consecutivo,
             fecha_asignacion,
             municipio_id,
-            solo_fotos == "true"
+            solo_fotos == "true",
+            lat,
+            lon
         ))
         conn.commit()
         cur.close()
         conn.close()
         return RedirectResponse("/form_asignacion?exito=1", status_code=303)
+    
+    except HTTPException:
+        raise
     except Exception as e:
         print("Error al insertar asignacion:", e)
         raise HTTPException(status_code=500, detail="Error al guardar la asignación.")

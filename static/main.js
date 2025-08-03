@@ -44,6 +44,14 @@ document.getElementById("modo-oscuro").addEventListener("click", function() {
   updateDarkModeIcon();
 });
 
+// --- Orden personalizado para fechas con nulos primero ---
+$.fn.dataTable.ext.type.order['fecha-null-first-pre'] = function(d) {
+    if (!d || d.trim() === "") {
+        return 9999999999999; // Siempre primero cuando el orden es DESC
+    }
+    return new Date(d).getTime();
+};
+
 $(document).ready(function () {
   M.Tooltip.init(document.querySelectorAll('.tooltipped'));
   const tablaElement = $('#tablaDashboard');
@@ -51,7 +59,16 @@ $(document).ready(function () {
 
   const tabla = tablaElement.DataTable({
     paging: false,
-    order: [[1, "desc"]],
+    order: [[2, "desc"], [3, "desc"]], // 2=Fecha Visita, 3=Hora Visita
+    orderMulti: true,
+    orderCellsTop: true,
+    stateSave: false,
+    columnDefs: [
+        {
+            targets: 2,       // Columna de Fecha Visita
+            type: "fecha-null-first-pre" // Usa nuestro tipo de orden
+        }
+    ],
     language: {
       url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
     },

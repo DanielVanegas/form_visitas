@@ -86,11 +86,12 @@
           <td>{{ a.fecha_facturacion or '' }}</td>
           <td>{{ '✅' if a.solo_fotos else '' }}</td>
           <td>
-            {% if a.fecha_entrega %}
-              <a href="/geovisor?consecutivo={{ a.consecutivo }}" class="btn-localizador tooltipped" data-tooltip="Ver en geovisor" target="_blank">
-                <i class="material-icons">location_on</i>
-              </a>
-            {% endif %}
+            <a href="https://www.google.com/maps?q={{ a.latitud }},{{ a.longitud }}" 
+              class="btn-localizador tooltipped" 
+              data-tooltip="Abrir en Google Maps"
+              target="_blank">
+              <i class="material-icons">location_on</i>
+            </a>
           </td>
           <td>
             <button class="btn-flat waves-effect edit-btn tooltipped" data-tooltip="Editar fila" style="color: #1565c0;">
