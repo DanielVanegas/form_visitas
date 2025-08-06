@@ -44,18 +44,23 @@ document.getElementById("modo-oscuro").addEventListener("click", function() {
   updateDarkModeIcon();
 });
 
-// --- Orden personalizado para fechas con nulos primero ---
-$.fn.dataTable.ext.type.order['fecha-null-first-pre'] = function(d) {
-    if (!d || d.trim() === "") {
-        return 9999999999999; // Siempre primero cuando el orden es DESC
-    }
-    return new Date(d).getTime();
-};
 
 $(document).ready(function () {
   M.Tooltip.init(document.querySelectorAll('.tooltipped'));
   const tablaElement = $('#tablaDashboard');
-  if (!tablaElement.length) return; // ✅ Si no hay tabla, salir
+  if (!tablaElement.length) return;
+
+  // Asignar data-order como timestamp a la columna Fecha Visita
+  $('#tablaDashboard td:nth-child(3)').each(function() {
+      const text = $(this).text().trim();
+      if (text === "") {
+          // Si está vacío, le damos un timestamp muy alto para que quede primero en DESC
+          $(this).attr("data-order", 99999999999999);
+      } else {
+          // Convertimos la fecha a timestamp para ordenar correctamente
+          $(this).attr("data-order", new Date(text).getTime());
+      }
+  });
 
   const tabla = tablaElement.DataTable({
     paging: false,
@@ -63,12 +68,6 @@ $(document).ready(function () {
     orderMulti: true,
     orderCellsTop: true,
     stateSave: false,
-    columnDefs: [
-        {
-            targets: 2,       // Columna de Fecha Visita
-            type: "fecha-null-first-pre" // Usa nuestro tipo de orden
-        }
-    ],
     language: {
       url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
     },
