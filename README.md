@@ -67,13 +67,11 @@ Incluye formularios dinámicos, un dashboard interactivo y un geovisor inmobilia
 
 ## 📸 Capturas de pantalla
 
-📍 *(Agrega imágenes en la carpeta `screenshots/` y enlázalas aquí, por ejemplo:)*  
-
-- `screenshots/home.png` – Panel principal  
-- `screenshots/form_asignacion.png` – Formulario de asignación  
-- `screenshots/form_visita.png` – Formulario de visita  
-- `screenshots/dashboard.png` – Dashboard de asignaciones  
-- `screenshots/geovisor.png` – Geovisor  
+![Home](screenshots/home.png)
+![Form_asignacion](screenshots/form_asignacion.png)
+![Form_visita](screenshots/form_visita.png)  
+![Dashboard](screenshots/dashboard.png)  
+![Geovisor](screenshots/geovisor.png)  
 
 ---
 
