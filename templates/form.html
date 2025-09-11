@@ -256,7 +256,114 @@
                 {% endfor %}
               </select>
     </div>
-    <br>
+
+    <div class="section-divider">
+      <div class="col s12">
+        <label>
+          <input type="checkbox" id="mas_info" name="mas_info" value="1"/>
+          <span>¿Más información?</span>
+        </label>
+      </div>
+
+      <div id="bloque_mas_info" style="display:none;">
+
+        <!-- Sección Garajes -->
+        <p>Garajes</p>
+        <div class="input-field">
+          <input id="num_garajes" name="num_garajes" type="number" min="0"/>
+          <label for="num_garajes">No. de garajes</label>
+        </div>
+
+        <div class="row">
+          <p>Cond. jurídica</p>
+          <div class="col s12">
+            <label>
+              <input class="with-gap" name="garaje_cond_juridica" type="radio" value="privado"/>
+              <span>Privado(s)</span>
+            </label>
+          </div>
+          <div class="col s12">
+            <label>
+              <input class="with-gap" name="garaje_cond_juridica" type="radio" value="exclusivo"/>
+              <span>Exclusivo(s)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="row">
+          <p>Cubierta</p>
+          <div class="col s12">
+            <label>
+              <input class="with-gap" name="garaje_cubierta" type="radio" value="cubierto(s)"/>
+              <span>Cubierto(s)</span>
+            </label>
+          </div>
+          <div class="col s12">
+            <label>
+              <input class="with-gap" name="garaje_cubierta" type="radio" value="descubierto(s)"/>
+              <span>Descubierto(s)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="row">
+          <p>Tipo</p>
+          <div class="col s12">
+            <label>
+              <input class="with-gap" name="garaje_tipo" type="radio" value="sencillo(s)"/>
+              <span>Sencillo(s)</span>
+            </label>
+          </div>
+          <div class="col s12">
+            <label>
+              <input class="with-gap" name="garaje_tipo" type="radio" value="doble(s)"/>
+              <span>Doble(s)</span>
+            </label>
+          </div>
+          <div class="col s12">
+            <label>
+              <input class="with-gap" name="garaje_tipo" type="radio" value="doble en servidumbre propia"/>
+              <span>Doble en servidumbre propia</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Sección Depósitos -->
+        <p>Depósitos</p>
+        <div class="input-field">
+          <input id="num_depositos" name="num_depositos" type="number" min="0"/>
+          <label for="num_depositos">No. de depósitos</label>
+        </div>
+
+        <div class="row">
+          <p>Cond. jurídica</p>
+          <div class="col s12">
+            <label>
+              <input class="with-gap" name="deposito_cond_juridica" type="radio" value="privado"/>
+              <span>Privado(s)</span>
+            </label>
+          </div>
+          <div class="col s12">
+            <label>
+              <input class="with-gap" name="deposito_cond_juridica" type="radio" value="exclusivo"/>
+              <span>Exclusivo(s)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Sección Áreas -->
+        <p>Áreas</p>
+        <div class="input-field">
+          <input id="area_construida" name="area_construida" type="number" step="0.01"/>
+          <label for="area_construida">Área construida (m²)</label>
+        </div>
+        <div class="input-field">
+          <input id="area_privada" name="area_privada" type="number" step="0.01"/>
+          <label for="area_privada">Área privada (m²)</label>
+        </div>
+      </div>
+    </div>
+
     <!-- Botones -->
     <div class="center-align">
       <button class="btn waves-effect blue darken-3 z-depth-1 hoverable" type="submit">

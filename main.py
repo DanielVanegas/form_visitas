@@ -43,18 +43,28 @@ def insertar_visita(data):
         cur = conn.cursor()
         cur.execute("""
             INSERT INTO app.visita (
-                id_asignacion, fecha_formulario,
-                nombre_solicitante, al_sur, al_norte, al_occidente, al_oriente,
+                fecha_formulario,
+                al_sur, al_norte, al_occidente, al_oriente,
                 sector, edificio, lote, tipologia, topografia, construccion,
                 sotanos, zonas_comunes, piso, vista,
-                formato_url, plano_url, id_usuario
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                id_usuario, id_asignacion,
+                mas_info, num_garajes, garaje_cond_juridica, garaje_cubierta,
+                garaje_tipo, num_depositos, deposito_cond_juridica,
+                area_construida, area_privada
+            ) VALUES (
+                %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s, %s, %s
+            );
         """, (
-            data.id_asignacion, data.fecha_formulario,
-            data.nombre_solicitante, data.al_sur, data.al_norte, data.al_occidente, data.al_oriente,
+            data.fecha_formulario,
+            data.al_sur, data.al_norte, data.al_occidente, data.al_oriente,
             data.sector, data.edificio, data.lote, data.tipologia, data.topografia, data.construccion,
             data.sotanos, data.zonas_comunes, data.piso, data.vista,
-            data.formato_url, data.plano_url, data.id_usuario
+            data.id_usuario, data.id_asignacion,
+            data.mas_info, data.num_garajes, data.garaje_cond_juridica, data.garaje_cubierta,
+            data.garaje_tipo, data.num_depositos, data.deposito_cond_juridica,
+            data.area_construida, data.area_privada
         ))
         conn.commit()
         cur.close()
@@ -98,7 +108,6 @@ def obtener_consecutivos_pendientes():
 class VisitaForm(BaseModel):
     id_asignacion: int
     fecha_formulario: str
-    nombre_solicitante: Optional[str] = None
     al_sur: Optional[str] = None
     al_norte: Optional[str] = None
     al_occidente: Optional[str] = None
@@ -113,9 +122,16 @@ class VisitaForm(BaseModel):
     zonas_comunes: Optional[str] = None
     piso: Optional[str] = None
     vista: Optional[str] = None
-    formato_url: Optional[str] = None
-    plano_url: Optional[str] = None
     id_usuario: Optional[int] = None
+    mas_info: Optional[bool] = False
+    num_garajes: Optional[int] = None
+    garaje_cond_juridica: Optional[str] = None
+    garaje_cubierta: Optional[str] = None
+    garaje_tipo: Optional[str] = None
+    num_depositos: Optional[int] = None
+    deposito_cond_juridica: Optional[str] = None
+    area_construida: Optional[float] = None
+    area_privada: Optional[float] = None
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
@@ -136,7 +152,6 @@ def mostrar_formulario(request: Request, exito: int = 0):
 async def recibir_formulario(request: Request,
     id_asignacion: int = Form(...),
     fecha_formulario: str = Form(...),
-    nombre_solicitante: Optional[str] = Form(None),
     al_sur: Optional[str] = Form(None),
     al_norte: Optional[str] = Form(None),
     al_occidente: Optional[str] = Form(None),
@@ -151,14 +166,20 @@ async def recibir_formulario(request: Request,
     zonas_comunes: Optional[str] = Form(None),
     piso: Optional[str] = Form(None),
     vista: Optional[str] = Form(None),
-    formato_url: Optional[str] = Form(None),
-    plano_url: Optional[str] = Form(None),
     id_usuario: int = Form(None),
+    mas_info: Optional[str] = Form(None),
+    num_garajes: Optional[str] = Form(None),
+    garaje_cond_juridica: Optional[str] = Form(None),
+    garaje_cubierta: Optional[str] = Form(None),
+    garaje_tipo: Optional[str] = Form(None),
+    num_depositos: Optional[str] = Form(None),
+    deposito_cond_juridica: Optional[str] = Form(None),
+    area_construida: Optional[str] = Form(None),
+    area_privada: Optional[str] = Form(None),
 ):
     form = VisitaForm(
         id_asignacion=id_asignacion,
         fecha_formulario=fecha_formulario,
-        nombre_solicitante=nombre_solicitante,
         al_sur=al_sur,
         al_norte=al_norte,
         al_occidente=al_occidente,
@@ -173,9 +194,16 @@ async def recibir_formulario(request: Request,
         zonas_comunes=zonas_comunes,
         piso=piso,
         vista=vista,
-        formato_url=formato_url,
-        plano_url=plano_url,
         id_usuario=id_usuario,
+        mas_info=(mas_info == "1"),
+        num_garajes=int(num_garajes) if num_garajes else None,
+        garaje_cond_juridica=garaje_cond_juridica,
+        garaje_cubierta=garaje_cubierta,
+        garaje_tipo=garaje_tipo,
+        num_depositos=int(num_depositos) if num_depositos else None,
+        deposito_cond_juridica=deposito_cond_juridica,
+        area_construida=float(area_construida) if area_construida else None,
+        area_privada=float(area_privada) if area_privada else None,
     )
     insertar_visita(form)
     return RedirectResponse("/form_visita?exito=1", status_code=303)

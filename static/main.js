@@ -7,9 +7,18 @@ if (window.location.search.includes("exito=1")) {
 
 // Inicializa los selects de Materialize al cargar el DOM
 document.addEventListener('DOMContentLoaded', function() {
+  // Inicializar selects
   var elems = document.querySelectorAll('select');
   if (typeof M !== 'undefined' && M.FormSelect) {
     M.FormSelect.init(elems);
+  }
+  // Mostrar/ocultar sección de más información
+  const chkMasInfo = document.getElementById("mas_info");
+  const bloqueMasInfo = document.getElementById("bloque_mas_info");
+  if (chkMasInfo && bloqueMasInfo) {
+    chkMasInfo.addEventListener("change", function() {
+      bloqueMasInfo.style.display = this.checked ? "block" : "none";
+    });
   }
 });
 
